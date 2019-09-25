@@ -1,0 +1,41 @@
+csvjdbc 在 sourceforge的csvjdbc 基础上开发，参考官网http://csvjdbc.sourceforge.net
+支持 hdfs 分布式存储，支持csv/txt文件
+
+1、resource 目录下添加 集群的hdfs-site.xml、core-site.xml配置文件
+2、编译打包 mvn package -Dmaven.test.skip=true
+3、示例
+
+<dependency>
+    <groupId>net.sourceforge.csvjdbc</groupId>
+    <artifactId>csvjdbc</artifactId>
+    <version>1.0.38-SNAPSHOT</version>
+</dependency>
+
+// Load the driver.
+Class.forName("org.relique.jdbc.csv.CsvDriver");
+ 
+// Create a connection to directory given as first command line
+// parameter. Driver properties are passed in URL format
+// (or alternatively in a java.utils.Properties object).
+//
+// A single connection is thread-safe for use by several threads.
+//String url = "jdbc:relique:csv:hdfs://nameservice1/user?" +
+ //       "separator=," + "&" + "fileExtension=.txt";
+String url = "jdbc:relique:csv:hdfs://nameservice1/appdata/csv/APP?" +
+        "separator=," + "&" + "fileExtension=.csv";
+Connection conn = DriverManager.getConnection(url);
+ 
+// Create a Statement object to execute the query with.
+// A Statement is not thread-safe.
+Statement stmt = conn.createStatement();
+ 
+// Select the ID and NAME columns from sample.csv
+ResultSet results = stmt.executeQuery("SELECT * FROM test");
+ 
+// Dump out the results to a CSV file with the same format
+// using CsvJdbc helper function
+boolean append = true;
+CsvDriver.writeToCsv(results, System.out, append);
+ 
+// Clean up
+conn.close();

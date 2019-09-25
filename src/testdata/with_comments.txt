@@ -1,0 +1,7 @@
+# comment line
+#second comment line
+#next comes the header
+name, id, value, comment
+alpha,1, 12.34, some field
+beta,2, 13.24, other parameter
+#hash#,3, 41.32, still a field

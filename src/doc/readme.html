@@ -1,0 +1,178 @@
+<html>
+
+<head>
+<title>CsvJdbc Readme</title>
+</head>
+
+<body bgcolor="#FFFFFF">
+
+<table border="0" cellpadding="2" cellspacing="1">
+    <tr>
+        <td><font face="Arial"><img src="CsvJdbcLogo.jpg" width="182" height="108" alt="The CsvJdbc Logo"></font></td>
+        <td><h1><font face="Arial">CsvJdbc - a JDBC driver for
+        CSV files</font></h1>
+        </td>
+    </tr>
+</tbale>
+<table border="0" cellpadding="2" cellspacing="1">
+    <tr>
+        <td valign="top"><font face="arial"><b>About</b></font><hr
+        size="1" noshade>
+        <p><font size="2" face="Arial">CsvJdbc is a simple read-only
+        JDBC driver that uses Comma Separated Value (CSV) files
+        as database tables. It is ideal for writing data
+        importing programs. </font></p><p></p>
+        </td>
+    </tr>
+    <tr>
+
+        <td valign="top"><font face="arial"><b>How is it used</b></font><hr
+        size="1" noshade>
+        <p><font size="2" face="Arial">The CsvJDBC driver is used
+        just like any other JDBC driver. The <i>csvjdbc.jar</i> file should be included in your application's classpath.</p>
+
+        <p><font size="2" face="Arial">The driver class is <b>org.relique.jdbc.csv.CsvDriver</b>
+        The connection URL is <b>jdbc:relique:csv:<i>csvdir</i></b>, where <i>csvdir</i> is the directory in which the .csv files are found.</font></p>
+
+ <p><font size="2" face="Arial">This example code shows
+        how the driver is used. </font></p>
+        <pre><font size="2">
+import java.sql.*;
+
+public class DemoDriver
+{
+  public static void main(String[] args)
+  {
+    try
+    {
+      // load the driver into memory
+      Class.forName(&quot;org.relique.jdbc.csv.CsvDriver&quot;);
+
+      // create a connection. The first command line parameter is assumed to
+      //  be the directory in which the .csv files are held
+      Connection conn = DriverManager.getConnection(&quot;jdbc:relique:csv:&quot; + args[0] );
+
+      // create a Statement object to execute the query with
+      Statement stmt = conn.createStatement();
+
+      // Select the ID and NAME columns from sample.csv
+      ResultSet results = stmt.executeQuery(&quot;SELECT ID,NAME FROM sample&quot;);
+
+      // dump out the results
+      while (results.next())
+      {
+        System.out.println(&quot;ID= &quot; + results.getString(&quot;ID&quot;) + &quot;   NAME= &quot; + results.getString(&quot;NAME&quot;));
+      }
+
+      // clean up
+      results.close();
+      stmt.close();
+      conn.close();
+    }
+    catch(Exception e)
+    {
+      System.out.println(&quot;Oops-&gt; &quot; + e);
+    }
+  }
+}
+</font></pre>
+        <p></p></td>
+    </tr>
+       <tr>
+	        <td valign="top"><font face="arial"><b>Advanced Options</b></font><hr
+	        size="1" noshade>
+	        <p><font size="2" face="Arial">The driver also supports a number of parameters that change the default behaviour of the driver.</p>
+	        <p><font size="2" face="Arial">These properties are:</p>
+	        <p><font size="2" face="Arial">
+	         <dl>
+	          <dt><b>separator</b></dt>
+	          <dd>Used to specify a different column separator (Default is ',').</dd>
+	          <dt><b>suppressHeaders</b></dt>
+	          <dd>Used to specify if the first line contains column header information (Default is <code>false</code>; column headers are on first line).</dd>
+	          <dt><b>fileExtension</b></dt>
+	          <dd>Used to specify a different file extension (Default is ".csv")</dd>
+	          <dt><b>charset</b></dt>
+	          <dd>Used to specify a different than default charset encoding of input file (default is same VM default charset)</dd>
+	          <dt><b>raiseUnsupportedOperationException</b></dt>
+	          <dd>Used to specify whether an UnsupportedOperationException must be raised when calling a connection method (such as setAutoCommit()) having no sense with csvJdbc (Default is "false")</dd>
+	         </dl>
+	        </p>
+
+         <p><font size="2" face="Arial">This following example code shows
+         how these properties are used. </font></p>
+         <pre><font size="2">  ...
+
+  Properties props = new java.util.Properties();
+
+  props.put("separator","|");              // separator is a bar
+  props.put("suppressHeaders","true");     // first line contains data
+  props.put("fileExtension",".txt");       // file extension is .txt
+  props.put("charset","ISO-8859-2");       // file encoding is "ISO-8859-2"
+  props.put("raiseUnsupportedOperationException","false");       // don't raise unsupported operation exception (when not relevant)
+
+  Connection conn = Drivermanager.getConnection(&quot;jdbc:relique:csv:&quot; + args[0],props)
+
+  ...</font>
+         </pre>
+	        <p></p></td>
+    </tr>
+      <tr>
+	        <td valign="top"><font face="arial"><b>Scrollable ResultSets</b></font><hr
+	        size="1" noshade>
+	        <p><font size="2" face="Arial">The driver also now supports scrollable result sets.</p>
+
+         <p><font size="2" face="Arial">This following example code shows
+         how these are used. </font></p>
+         <pre><font size="2">  ...
+
+  Connection conn = Drivermanager.getConnection(&quot;jdbc:relique:csv:&quot; + args[0],props)
+
+  Statement stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, 0);
+
+  ResultSet results = stmt.executeQuery(&quot;SELECT ID,NAME FROM sample&quot;);
+
+  resulst.next();
+  ...
+  results.first();
+  ...
+  results.previous();
+  ...
+  results.relative(2);
+  ...
+  results.absolute(2);
+  ...</font>
+         </pre>
+	        <p></p></td>
+    </tr>
+    <tr>
+        <td valign="top"><font face="arial"><b>FAQ</b></font><hr
+        size="1" noshade>
+        <p>
+         <font size="2" face="Arial">
+         <dl>
+          <dt><b>Does the driver support UPDATE and DELETE statements ?</b></dt>
+          <dd>No the driver does not. It is a read-only driver and as such only supports the SELECT statement.<br><br></dd>
+          <dt><b>Does the driver support WHERE and ORDER BY clauses ?</b></dt>
+          <dd>The driver does not support the ORDER BY clause. It does support the WHERE clause but only for a single field and only for the equals function. The field must be part of the SELECT statement.<br><br></dd>
+         </dl>
+         </font>
+        </p>
+        </td>
+    </tr>
+    <tr>
+        <td valign="top"><font face="arial"><b>More Information</b></font><hr
+        size="1" noshade>
+        <p><font size="2" face="Arial">The latest version of the
+        software can be found at </font><a
+        href="http://www.sourceforge.net/projects/csvjdbc"><font
+        size="2" face="Arial">http://www.sourceforge.net/projects/csvjdbc</font></a><font
+        size="2" face="Arial">. </font></p>
+        </td>
+    </tr>
+</table>
+
+<p><font size="1" face="Arial"><i>Last modified: $Id: index.html,v
+1.1 2001/01/22 10:17:30 jackerm Exp $</i></font><font
+face="Arial"> </font></p>
+</body>
+</html>
